@@ -1,0 +1,7 @@
+funcao Main() 
+    se(1<2)
+        escreva("1 menor que 2");
+    fimSe
+    Texto mensagem <- "Ola, Mundo! Este e o meu primeiro programa.";
+    escreva(mensagem);
+fimFuncao
