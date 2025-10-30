@@ -1,81 +1,107 @@
 %{
 #include <stdio.h>
+#include <string.h>
+#include "parser.tab.h"
 %}
 
 %%
-"se"            { printf("IF "); }
-"fimSe"         { printf("ENDIF "); }
-"senao"         { printf("ELSE "); }
-"fimSenao"      { printf("ENDELSE "); }
-"para"          { printf("FOR "); }
-"fimPara"       { printf("ENDFOR "); }
-"escolha"       { printf("SWITCH "); }
-"enquanto"      { printf("WHILE "); }
-"retorne"       { printf("RETURN "); }
-"escreva"       { printf("PRINTF "); }
-"leia"          { printf("SCANF "); }
-"constante"     { printf("CONST "); }
-"pare"          { printf("BREAK "); }
-"continue"      { printf("CONTINUE "); }
-"caso"          { printf("CASE "); }
-"tente"         { printf("TRY "); }
-"pegue"         { printf("CATCH "); }
-"entao"         { printf("FINALLY "); }
-"repita"        { printf("DO "); }
-"ate"           { printf("UNTIL "); }
-"funcao"        { printf("FUNCTION "); }
-"fimFuncao"     { printf("ENDFUNCTION "); }
-"estrutura"     { printf("STRUCT "); }
-"fimEstrutura"  { printf("ENDSTRUCT "); }
-"enumerado"     { printf("ENUM "); }
 
-"Inteiro"       { printf("TYPE_INT "); }
-"Real"          { printf("TYPE_FLOAT "); }
-"Texto"         { printf("TYPE_STRING "); }
-"Booleano"      { printf("TYPE_BOOL "); }
-"Lista"         { printf("TYPE_LIST "); }
-"Cadeia"        { printf("TYPE_STRING "); }
-"Int"           { printf("TYPE_INT "); }
-"Flut"          { printf("TYPE_FLOAT "); }
+"se"            { return IF; }
+"fimSe"         { return ENDIF; }
+"senao"         { return ELSE; }
+"fimSenao"      { return ENDELSE; }
+"para"          { return FOR; }
+"fimPara"       { return ENDFOR; }
+"escolha"       { return SWITCH; }
+"enquanto"      { return WHILE; }
+"retorne"       { return RETURN; }
+"escreva"       { return PRINTF; }
+"leia"          { return SCANF; }
+"constante"     { return CONST; }
+"pare"          { return BREAK; }
+"continue"      { return CONTINUE; }
+"caso"          { return CASE; }
+"tente"         { return TRY; }
+"pegue"         { return CATCH; }
+"entao"         { return FINALLY; }
+"repita"        { return DO; }
+"ate"           { return UNTIL; }
+"funcao"        { return FUNCTION; }
+"fimFuncao"     { return ENDFUNCTION; }
+"estrutura"     { return STRUCT; }
+"fimEstrutura"  { return ENDSTRUCT; }
+"enumerado"     { return ENUM; }
 
-"<-"            { printf("ASSIGN "); }
-"=="            { printf("EQ "); }
-"!="            { printf("NE "); }
-"<="            { printf("LE "); }
-">="            { printf("GE "); }
-"<"             { printf("LT "); }
-">"             { printf("GT "); }
-"&&"            { printf("AND "); }
-"||"            { printf("OR "); }
-"!"             { printf("NOT "); }
-"+="            { printf("PLUS_ASSIGN "); }
-"-="            { printf("MINUS_ASSIGN "); }
-"*="            { printf("MUL_ASSIGN "); }
-"/="            { printf("DIV_ASSIGN "); }
+"Inteiro"       { return TYPE_INT; }
+"Real"          { return TYPE_FLOAT; }
+"Texto"         { return TYPE_STRING; }
+"Booleano"      { return TYPE_BOOL; }
+"Lista"         { return TYPE_LIST; }
+"Cadeia"        { return TYPE_STRING; }
+"Int"           { return TYPE_INT; }
+"Flut"          { return TYPE_FLOAT; }
 
-";"             { printf("SEMICOLON "); }
-","             { printf("COMMA "); }
-"("             { printf("LPAREN "); }
-")"             { printf("RPAREN "); }
-"{"             { printf("LBRACE "); }
-"}"             { printf("RBRACE "); }
-"["             { printf("LBRACKET "); }
-"]"             { printf("RBRACKET "); }
-"."             { printf("DOT "); }
+"<-"            { return ASSIGN; }
+"=="            { return EQ; }
+"!="            { return NE; }
+"<="            { return LE; }
+">="            { return GE; }
+"<"             { return LT; }
+">"             { return GT; }
+"&&"            { return AND; }
+"||"            { return OR; }
+"!"             { return NOT; }
 
-[a-zA-Z_][a-zA-Z0-9_]*  { printf("ID(%s) ", yytext); }
-[0-9]+\.[0-9]+              { printf("FLOAT_LIT(%s) ", yytext); }
-[0-9]+                      { printf("INT_LIT(%s) ", yytext); }
-\"(\\.|[^"\\])*\"       { printf("STRING_LIT(%s) ", yytext); }
+"+="            { return PLUS_ASSIGN; }
+"-="            { return MINUS_ASSIGN; }
+"*="            { return MUL_ASSIGN; }
+"/="            { return DIV_ASSIGN; }
+
+"++"            { return PLUSPLUS; }
+"--"            { return MINUSMINUS; }
+"+"             { return PLUS; }
+"-"             { return MINUS; }
+"*"             { return MUL; }
+"/"             { return DIV; }
+
+
+";"             { return SEMICOLON; }
+","             { return COMMA; }
+"("             { return LPAREN; }
+")"             { return RPAREN; }
+"{"             { return LBRACE; }
+"}"             { return RBRACE; }
+"["             { return LBRACKET; }
+"]"             { return RBRACKET; }
+"."             { return DOT; }
+
+[a-zA-Z_][a-zA-Z0-9_]* { 
+    yylval.sval = strdup(yytext); 
+    return ID; 
+}
+[0-9]+\.[0-9]+              { 
+    yylval.sval = strdup(yytext); 
+    return FLOAT_LIT; 
+}
+[0-9]+                      { 
+    yylval.sval = strdup(yytext); 
+    return INT_LIT; 
+}
+\"(\\.|[^"\\])*\"       { 
+    /* Remove as aspas do literal de string */
+    char *str = strdup(yytext + 1);
+    str[strlen(str) - 1] = '\0';
+    yylval.sval = str;
+    return STRING_LIT; 
+}
 
 [ \t\r\n]+                  { /* Ignora espaços em branco */ }
 \/\/.* { /* Ignora comentários de linha única */ }
 
-.                           { printf("UNKNOWN(%s) ", yytext); }
+.                           { printf("CARACTERE DESCONHECIDO: %s\n", yytext); }
 
 %%
 
-int main(int argc, char **argv) {
-    yylex();
-    return 0;
+int yywrap() {
+    return 1;
 }
