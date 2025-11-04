@@ -3,7 +3,7 @@ funcao Lista<Inteiro> merge(Lista<Inteiro> esquerda, Lista<Inteiro> direita)
     Inteiro indice_esq <- 0;
     Inteiro indice_dir <- 0;
     
-    enquanto (indice_esq < esquerda.tamanho() && indice_dir < direita.tamanho()) {
+    enquanto (indice_esq < esquerda.tamanho() && indice_dir < direita.tamanho()) 
         se (esquerda[indice_esq] < direita[indice_dir])
             resultado.adicionar(esquerda[indice_esq]);
             indice_esq += 1;
@@ -11,17 +11,17 @@ funcao Lista<Inteiro> merge(Lista<Inteiro> esquerda, Lista<Inteiro> direita)
             resultado.adicionar(direita[indice_dir]);
             indice_dir += 1;
         fimSe
-    }
+    fimEnquanto
     
-    enquanto (indice_esq < esquerda.tamanho()) {
+    enquanto (indice_esq < esquerda.tamanho()) 
         resultado.adicionar(esquerda[indice_esq]);
         indice_esq += 1;
-    }
+    fimEnquanto
 
-    enquanto (indice_dir < direita.tamanho()) {
+    enquanto (indice_dir < direita.tamanho()) 
         resultado.adicionar(direita[indice_dir]);
         indice_dir += 1;
-    }
+    fimEnquanto
 
     retorne resultado;
 fimFuncao

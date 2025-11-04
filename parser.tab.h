@@ -61,11 +61,11 @@ extern int yydebug;
     IF = 262,                      /* IF  */
     ENDIF = 263,                   /* ENDIF  */
     ELSE = 264,                    /* ELSE  */
-    ENDELSE = 265,                 /* ENDELSE  */
-    FOR = 266,                     /* FOR  */
-    ENDFOR = 267,                  /* ENDFOR  */
-    SWITCH = 268,                  /* SWITCH  */
-    WHILE = 269,                   /* WHILE  */
+    FOR = 265,                     /* FOR  */
+    ENDFOR = 266,                  /* ENDFOR  */
+    SWITCH = 267,                  /* SWITCH  */
+    WHILE = 268,                   /* WHILE  */
+    ENDWHILE = 269,                /* ENDWHILE  */
     RETURN = 270,                  /* RETURN  */
     PRINTF = 271,                  /* PRINTF  */
     SCANF = 272,                   /* SCANF  */

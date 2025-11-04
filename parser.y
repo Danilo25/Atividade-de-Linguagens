@@ -18,7 +18,7 @@ void yyerror(const char *s);
 %token <sval> FLOAT_LIT
 %token <sval> STRING_LIT
 
-%token IF ENDIF ELSE ENDELSE FOR ENDFOR SWITCH WHILE
+%token IF ENDIF ELSE FOR ENDFOR SWITCH WHILE ENDWHILE
 %token RETURN PRINTF SCANF CONST BREAK CONTINUE CASE TRY CATCH FINALLY
 %token DO UNTIL FUNCTION ENDFUNCTION STRUCT ENDSTRUCT ENUM
 %token TYPE_INT TYPE_FLOAT TYPE_STRING TYPE_BOOL TYPE_LIST
@@ -114,12 +114,15 @@ expression_statement:
 if_statement:
     IF LPAREN expression RPAREN statement_list ENDIF
     | IF LPAREN expression RPAREN statement_list ELSE statement_list ENDIF
-    /* NOTA: Ignorando 'ENDELSE' para simplicidade, 
-       pois complica a gramática e 'se/senao/fimSe' é mais comum. */
+    ;
+
+switch_statement:
+    SWITCH LPAREN expression RPAREN statement_list ENDIF
+    | IF LPAREN expression RPAREN statement_list ELSE statement_list ENDIF
     ;
 
 while_statement:
-    WHILE LPAREN expression RPAREN brace_block
+    WHILE LPAREN expression RPAREN statement_list ENDWHILE
     ;
 
 for_statement:
@@ -191,6 +194,7 @@ expression_list:
 %%
 
 int main(int argc, char **argv) {
+    yylineno = 0;
     printf("Iniciando o parser...\n");
     if (yyparse() == 0) {
         printf("Parsing concluído com sucesso!\n");

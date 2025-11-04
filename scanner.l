@@ -9,11 +9,11 @@
 "se"            { return IF; }
 "fimSe"         { return ENDIF; }
 "senao"         { return ELSE; }
-"fimSenao"      { return ENDELSE; }
 "para"          { return FOR; }
 "fimPara"       { return ENDFOR; }
 "escolha"       { return SWITCH; }
 "enquanto"      { return WHILE; }
+"fimEnquanto"   { return ENDWHILE; }
 "retorne"       { return RETURN; }
 "escreva"       { return PRINTF; }
 "leia"          { return SCANF; }
@@ -95,7 +95,8 @@
     return STRING_LIT; 
 }
 
-[ \t\r\n]+                  { /* Ignora espaços em branco */ }
+[ \t\r]+                  { /* Ignora espaços em branco */ }
+\n    { yylineno += 1; }
 \/\/.* { /* Ignora comentários de linha única */ }
 
 .                           { printf("CARACTERE DESCONHECIDO: %s\n", yytext); }
