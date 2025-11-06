@@ -29,33 +29,29 @@ O projeto inclui arquivos de exemplo na pasta `src/` para demonstrar diferentes 
 - **`src/erro.dtlang`**, com um exemplo de erro de sintaxe.
 - **`src/escolha.dtlang`**, com um exemplo do statement `escolha`.
 
-## Passo a Passo (justfile)
+## Passo a Passo (make)
 
-O **justfile** automatiza todos os comandos utilizados o processo de build e execução do compilador. Para usá-lo, instale o `just`:
-
-```bash
-# Linux (Ubuntu/Debian)
-$ sudo apt install just
-```
+O **make** automatiza todos os comandos utilizados o processo de build e execução do compilador.
 
 ### 1. Gere automaticamente o compilador com Flex, Bison e GCC
 
 Este comando executa automaticamente todos os passos necessários para construir o compilador, incluindo a criação da pasta de build, geração do scanner e parser, e compilação final.
 
 ```bash
-$ just build 
+$ make build 
 ```
 
 ### 2. Execute um dos arquivos de teste com o compilador
 
 Compila e executa um arquivo fonte DataLang, processando sua sintaxe e exibindo o resultado da análise.
+
 ```bash
-$ just compile src/demo.dtlang
+$ make compile file=src/demo.dtlang
 ```
 
 ## Passo a Passo (manual)
 
-Caso prefira não usar o **justfile**, você pode executar manualmente os comandos abaixo. Todos os passos funcionam da mesma forma, apenas requerem execução individual de cada comando.
+Caso prefira não usar o _make_, você pode executar manualmente os comandos abaixo. Todos os passos funcionam da mesma forma, apenas requerem execução individual de cada comando.
 
 ### 1. Crie um diretório de build
 
