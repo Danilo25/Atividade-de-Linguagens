@@ -1,0 +1,5 @@
+funcao Inteiro Main()
+    statementInexistente (2 + 2)
+        1 + 1;
+    fimStatementInexistente
+fimFuncao
