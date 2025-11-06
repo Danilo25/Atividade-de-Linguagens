@@ -18,8 +18,8 @@ void yyerror(const char *s);
 %token <sval> FLOAT_LIT
 %token <sval> STRING_LIT
 
-%token IF ENDIF ELSE FOR ENDFOR SWITCH WHILE ENDWHILE
-%token RETURN PRINTF SCANF CONST BREAK CONTINUE CASE TRY CATCH FINALLY
+%token IF ENDIF ELSE FOR ENDFOR SWITCH ENDSWITCH WHILE ENDWHILE
+%token RETURN PRINTF SCANF CONST BREAK CONTINUE CASE DEFAULTCASE TRY CATCH FINALLY
 %token DO UNTIL FUNCTION ENDFUNCTION STRUCT ENDSTRUCT ENUM
 %token TYPE_INT TYPE_FLOAT TYPE_STRING TYPE_BOOL TYPE_LIST
 
@@ -95,6 +95,7 @@ statement:
     expression_statement
     | declaration_statement
     | if_statement
+    | switch_statement
     | while_statement
     | for_statement
     | return_statement
@@ -116,9 +117,24 @@ if_statement:
     | IF LPAREN expression RPAREN statement_list ELSE statement_list ENDIF
     ;
 
+case_item:
+    CASE expression
+        statement_list
+    ;
+    
+default_case:
+    DEFAULTCASE
+        statement_list
+    ;
+
+case_list:
+    case_item
+    | case_list case_item
+    ;
+
 switch_statement:
-    SWITCH LPAREN expression RPAREN statement_list ENDIF
-    | IF LPAREN expression RPAREN statement_list ELSE statement_list ENDIF
+    SWITCH LPAREN expression RPAREN case_list ENDSWITCH
+    | SWITCH LPAREN expression RPAREN case_list default_case ENDSWITCH
     ;
 
 while_statement:

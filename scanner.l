@@ -12,6 +12,7 @@
 "para"          { return FOR; }
 "fimPara"       { return ENDFOR; }
 "escolha"       { return SWITCH; }
+"fimEscolha"    { return ENDSWITCH; }
 "enquanto"      { return WHILE; }
 "fimEnquanto"   { return ENDWHILE; }
 "retorne"       { return RETURN; }
@@ -21,6 +22,7 @@
 "pare"          { return BREAK; }
 "continue"      { return CONTINUE; }
 "caso"          { return CASE; }
+"casoPadrao"    { return DEFAULTCASE; }
 "tente"         { return TRY; }
 "pegue"         { return CATCH; }
 "entao"         { return FINALLY; }
