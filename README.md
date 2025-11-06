@@ -17,6 +17,14 @@ Caso ainda não tenha os pacotes acima, você pode facilmente instalá-los:
 $ sudo apt install flex bison gcc
 ```
 
+## Exemplos
+
+O projeto inclui arquivos de exemplo na pasta `src/` para demonstrar diferentes aspectos da linguagem:
+
+- **`src/demo.dtlang`**, com um exemplo de implementação de merge e mergeSort de listas numéricas.
+- **`src/erro.dtlang`**, com um exemplo de erro de sintaxe.
+- **`src/escolha.dtlang`**, com um exemplo do statement `escolha`.
+
 ## Passo a Passo (justfile)
 
 O **justfile** automatiza todos os comandos utilizados o processo de build e execução do compilador. Para usá-lo, instale o `just`:
