@@ -1,5 +1,9 @@
 # DataLang - Analisador Léxico e Sintático
 
+<img alt="Flex Badge" src="https://img.shields.io/badge/flex-2.6.4-blue?style=flat">
+<img alt="Bison Badge" src="https://img.shields.io/badge/bison-3.8.2-blue?style=flat">
+<img alt="GCC Badge" src="https://img.shields.io/badge/gcc-13.3.0-blue?style=flat">
+
 Este guia descreve os passos necessários para gerar, compilar e executar o analisador léxico e sintático da linguagem **DataLang** utilizando **Flex**, **Bison** e **GCC**.
 
 ## Requisitos
