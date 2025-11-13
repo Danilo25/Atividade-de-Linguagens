@@ -1,0 +1,5 @@
+funcao Inteiro somar(Inteiro a, Inteiro b)
+    Inteiro resultado;
+    resultado <- a + b;
+    retorne resultado;
+fimFuncao

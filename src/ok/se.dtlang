@@ -1,0 +1,8 @@
+funcao Inteiro testarIdade(Inteiro idade)
+    se (idade >= 18)
+        escreva("Maior de idade");
+    senao
+        escreva("Menor de idade");
+    fimSe
+    retorne 0;
+fimFuncao

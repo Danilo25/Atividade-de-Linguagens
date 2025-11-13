@@ -1,0 +1,16 @@
+estrutura No
+    Inteiro valor;
+    Inteiro indiceEsquerda; // Índice do filho na lista
+    Inteiro indiceDireita; // Índice do filho na lista
+fimEstrutura
+
+funcao Inteiro construirArvore()
+    Lista<No> minhaArvore;
+
+    escreva(minhaArvore[0].valor);
+    
+    Inteiro indiceEsq <- minhaArvore[0].indiceEsquerda;
+    escreva(minhaArvore[indiceEsq].valor);
+    
+    retorne 0;
+fimFuncao

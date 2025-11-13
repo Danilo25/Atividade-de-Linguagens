@@ -1,0 +1,6 @@
+funcao Inteiro acessarLista()
+    Lista<Inteiro> numeros;
+    Inteiro primeiro <- numeros[0];
+    escreva(primeiro);
+    retorne 0;
+fimFuncao

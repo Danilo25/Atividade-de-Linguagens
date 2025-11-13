@@ -6,17 +6,23 @@
 extern int yylex(void);
 extern char *yytext;
 extern int yylineno;
+extern int get_lex_error_count();
+
 void yyerror(const char *s);
+
+int syntax_error_count = 0;
 %}
 
 %union {
-    char *sval;
+    int int_val;
+    double float_val;
+    char *str_val;
 }
 
-%token <sval> ID
-%token <sval> INT_LIT
-%token <sval> FLOAT_LIT
-%token <sval> STRING_LIT
+%token <str_val> ID
+%token <int_val> INT_LIT
+%token <float_val> FLOAT_LIT
+%token <str_val> STRING_LIT
 
 %token IF ENDIF ELSE FOR ENDFOR SWITCH ENDSWITCH WHILE ENDWHILE
 %token RETURN PRINTF SCANF CONST BREAK CONTINUE CASE DEFAULTCASE TRY CATCH FINALLY
@@ -29,7 +35,7 @@ void yyerror(const char *s);
 
 %token PLUS MINUS MUL DIV PLUSPLUS MINUSMINUS
 
-%token SEMICOLON COMMA LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET DOT
+%token SEMICOLON COLON COMMA LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET DOT
 
 %right ASSIGN PLUS_ASSIGN MINUS_ASSIGN MUL_ASSIGN DIV_ASSIGN
 %left OR
@@ -39,7 +45,8 @@ void yyerror(const char *s);
 %left PLUS MINUS
 %left MUL DIV
 %right NOT PLUSPLUS MINUSMINUS
-%left LPAREN RPAREN LBRACKET RBRACKET DOT
+%left DOT
+%left LPAREN RPAREN LBRACKET RBRACKET
 
 %%
 
@@ -49,6 +56,21 @@ program:
 
 declaration_list:
     | declaration_list function_definition
+    | declaration_list struct_definition
+    ;
+
+struct_definition:
+    STRUCT ID
+        member_list
+    ENDSTRUCT
+    ;
+
+member_list:
+    | member_list member
+    ;
+
+member:
+    type ID SEMICOLON
     ;
 
 function_definition:
@@ -94,6 +116,7 @@ statement_list:
 statement:
     expression_statement
     | declaration_statement
+    | do_statement
     | if_statement
     | switch_statement
     | while_statement
@@ -105,11 +128,19 @@ statement:
     ;
 
 declaration_statement:
-    type ID ASSIGN expression SEMICOLON
+    type ID SEMICOLON
+    | type ID ASSIGN expression SEMICOLON
     ;
 
 expression_statement:
     expression SEMICOLON
+    ;
+
+do_statement:
+    DO DOT 
+    | statement_list 
+    UNTIL LPAREN expression RPAREN SEMICOLON
+    |
     ;
 
 if_statement:
@@ -118,12 +149,12 @@ if_statement:
     ;
 
 case_item:
-    CASE expression
+    CASE expression COLON
         statement_list
     ;
     
 default_case:
-    DEFAULTCASE
+    DEFAULTCASE COLON
         statement_list
     ;
 
@@ -210,16 +241,19 @@ expression_list:
 %%
 
 int main(int argc, char **argv) {
-    yylineno = 0;
-    printf("Iniciando o parser...\n");
-    if (yyparse() == 0) {
+    int parse_result = yyparse();
+    int lex_errors = get_lex_error_count();
+
+    if (parse_result == 0 && lex_errors == 0 && syntax_error_count == 0) {
         printf("Parsing concluído com sucesso!\n");
+        return 0;
     } else {
-        printf("Parsing falhou.\n");
+        fprintf(stderr, "Parsing falhou.\n");
+        return 1;
     }
-    return 0;
 }
 
 void yyerror(const char *s) {
     fprintf(stderr, "Erro de Sintaxe na linha %d: %s (perto de '%s')\n", yylineno, s, yytext);
+    syntax_error_count++;
 }
