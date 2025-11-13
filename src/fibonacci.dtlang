@@ -1,0 +1,14 @@
+funcao Inteiro fibonacci(Inteiro n)
+    escolha (n)
+        caso 0
+            retorne n;
+        caso 1
+            retorne n;
+        casoPadrao
+            retorne fibonacci(n-1) + fibonacci(n-2);
+    fimEscolha
+fimFuncao
+
+funcao Inteiro Main()
+    Inteiro valor <- fibonacci(10);
+fimFuncao
