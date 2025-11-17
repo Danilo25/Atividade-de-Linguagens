@@ -1,0 +1,13 @@
+cd /c/Users/Danilo/Desktop/linguagens/Livros/atv6
+
+bison -d atv6/parser.y
+
+flex -o lex.yy.c atv6/scanner.l
+
+gcc -o meu_compilador parser.tab.c lex.yy.c lib/record.c lib/symbol_table.c -lfl
+
+./meu_compilador teste.dtlang saida.c
+
+gcc -o meu_programa saida.c
+
+./meu_programa

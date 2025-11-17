@@ -1,0 +1,7 @@
+funcao Inteiro Main()
+    Inteiro x;
+    escreva("Digite um numero:");
+    leia(x);
+    escreva("O valor selecionado foi: " + x);
+    retorne 0;
+fimFuncao
