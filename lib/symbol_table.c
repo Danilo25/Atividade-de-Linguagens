@@ -1,10 +1,11 @@
-// symbol_table.c
 #include "symbol_table.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include "parser.tab.h"
 
-// Uma lista simples de pares nome→tipo com suporte a escopo
+extern int yylineno;
+
 typedef struct Sym {
     char *name;
     char *type;
@@ -25,7 +26,6 @@ void pushScope(void) {
 }
 
 void popScope(void) {
-    // Remove todas as variáveis do escopo atual
     Sym **current = &symbols;
     while (*current) {
         if ((*current)->scope_level == current_scope) {
@@ -51,25 +51,37 @@ void insertSymbol(const char *name, const char *type) {
 }
 
 const char *lookupSymbol(const char *name) {
+    Sym *best_match = NULL;
     for (Sym *s = symbols; s; s = s->next) {
         if (strcmp(s->name, name) == 0) {
-            return s->type;
+            if (s->scope_level <= current_scope) {
+                if (best_match == NULL || s->scope_level > best_match->scope_level) {
+                    best_match = s;
+                }
+            }
         }
     }
-    return NULL; // Variável não encontrada
+
+    if (best_match != NULL) {
+        return best_match->type;
+    }
+    return NULL;
 }
 
-// Função para verificar se um símbolo existe
 int symbolExists(const char *name) {
+    Sym *best_match = NULL;
     for (Sym *s = symbols; s; s = s->next) {
         if (strcmp(s->name, name) == 0) {
-            return 1;
+            if (s->scope_level <= current_scope) {
+                if (best_match == NULL || s->scope_level > best_match->scope_level) {
+                    best_match = s;
+                }
+            }
         }
     }
-    return 0;
+    return (best_match != NULL);
 }
 
-// Função para verificar se um símbolo existe no escopo atual
 int symbolExistsInCurrentScope(const char *name) {
     for (Sym *s = symbols; s; s = s->next) {
         if (strcmp(s->name, name) == 0 && s->scope_level == current_scope) {
@@ -79,28 +91,24 @@ int symbolExistsInCurrentScope(const char *name) {
     return 0;
 }
 
-// Função para verificar se um símbolo já foi declarado no escopo atual
 int symbolAlreadyDeclared(const char *name) {
     return symbolExistsInCurrentScope(name);
 }
 
-// Função para verificar variável não declarada
 void checkUndeclaredVariable(const char *name) {
     if (!symbolExists(name)) {
-        fprintf(stderr, "ERRO SEMÂNTICO: variável '%s' não declarada\n", name);
+        fprintf(stderr, "ERRO SEMÂNTICO: variável '%s' não declarada (linha %d)\n", name, yylineno);
         exit(1);
     }
 }
 
-// Função para verificar variável duplicada no mesmo escopo
 void checkDuplicateVariable(const char *name) {
     if (symbolExistsInCurrentScope(name)) {
-        fprintf(stderr, "ERRO SEMÂNTICO: variável '%s' já declarada no escopo atual\n", name);
+        fprintf(stderr, "ERRO SEMÂNTICO: variável '%s' já declarada no escopo atual (linha %d)\n", name, yylineno);
         exit(1);
     }
 }
 
-// Função para obter o escopo atual
 int getCurrentScope(void) {
     return current_scope;
 }
