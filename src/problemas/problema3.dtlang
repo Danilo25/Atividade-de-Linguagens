@@ -1,0 +1,105 @@
+// Função para somar duas matrizes
+funcao Matriz<Real> SomarMatrizes(Matriz<Real> A, Matriz<Real> B, Inteiro linhas, Inteiro colunas)
+    // 1. Aloca a matriz de resultado
+    Matriz<Real> resultado <- novo Matriz<Real>(linhas, colunas);
+    
+    // 2. Realiza a soma
+    para (Inteiro i <- 0; i < linhas; i++)
+        para (Inteiro j <- 0; j < colunas; j++)
+            resultado[i][j] <- A[i][j] + B[i][j];
+        fimPara
+    fimPara
+    
+    retorne resultado;
+fimFuncao
+
+// Função para multiplicar duas matrizes
+funcao Matriz<Real> MultiplicarMatrizes(Matriz<Real> A, Matriz<Real> B, Inteiro linA, Inteiro colA, Inteiro colB)
+    // 1. Aloca a matriz de resultado (Linhas de A x Colunas de B)
+    Matriz<Real> resultado <- novo Matriz<Real>(linA, colB);
+    
+    // 2. Realiza a multiplicação
+    para (Inteiro i <- 0; i < linA; i++)
+        para (Inteiro j <- 0; j < colB; j++)
+            resultado[i][j] <- 0.0; // Inicializa com 0
+            
+            para (Inteiro k <- 0; k < colA; k++)
+                resultado[i][j] <- resultado[i][j] + (A[i][k] * B[k][j]);
+            fimPara
+        fimPara
+    fimPara
+    
+    retorne resultado;
+fimFuncao
+
+// Função auxiliar para imprimir uma matriz (para evitar repetição na Main)
+funcao Inteiro ImprimirMatriz(Matriz<Real> M, Inteiro linhas, Inteiro colunas)
+    para (Inteiro i <- 0; i < linhas; i++)
+        para (Inteiro j <- 0; j < colunas; j++)
+            escreva(M[i][j]);
+        fimPara
+    fimPara
+    retorne 0;
+fimFuncao
+
+// ============================================================
+// FUNÇÃO PRINCIPAL
+// ============================================================
+
+funcao Inteiro Main()
+    escreva("=== PROBLEMA 3: Matrizes com Funções ===");
+
+    // 1. Coleta de Dimensões e Alocação
+    Inteiro la; Inteiro ca;
+    escreva("Matriz A - Linhas:");  leia(la);
+    escreva("Matriz A - Colunas:"); leia(ca);
+    Matriz<Real> mA <- novo Matriz<Real>(la, ca);
+    
+    Inteiro lb; Inteiro cb;
+    escreva("Matriz B - Linhas:");  leia(lb);
+    escreva("Matriz B - Colunas:"); leia(cb);
+    Matriz<Real> mB <- novo Matriz<Real>(lb, cb);
+    
+    // 2. Leitura dos Dados
+    escreva("Digite os elementos da Matriz A:");
+    para (Inteiro i <- 0; i < la; i++)
+        para (Inteiro j <- 0; j < ca; j++)
+            leia(mA[i][j]);
+        fimPara
+    fimPara
+
+    escreva("Digite os elementos da Matriz B:");
+    para (Inteiro i <- 0; i < lb; i++)
+        para (Inteiro j <- 0; j < cb; j++)
+            leia(mB[i][j]);
+        fimPara
+    fimPara
+
+    // 3. Chamada da Função de Soma
+    se (la == lb && ca == cb)
+        escreva("--- Soma (A + B) ---");
+        
+        // Chamada da função criada acima
+        Matriz<Real> resSoma <- SomarMatrizes(mA, mB, la, ca);
+        
+        // Impressão do resultado
+        ImprimirMatriz(resSoma, la, ca);
+    senao
+        escreva("Impossível somar: Dimensões diferentes.");
+    fimSe
+
+    // 4. Chamada da Função de Produto
+    se (ca == lb)
+        escreva("--- Produto (A * B) ---");
+        
+        // Chamada da função criada acima
+        Matriz<Real> resProd <- MultiplicarMatrizes(mA, mB, la, ca, cb);
+        
+        // Impressão do resultado
+        ImprimirMatriz(resProd, la, cb);
+    senao
+        escreva("Impossível multiplicar: Colunas de A != Linhas de B.");
+    fimSe
+
+    retorne 0;
+fimFuncao

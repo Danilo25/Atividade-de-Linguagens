@@ -41,6 +41,7 @@ int error_count = 0;
 "Texto"          { return TYPE_STRING; }
 "Booleano"       { return TYPE_BOOL; }
 "Lista"          { return TYPE_LIST; }
+"Matriz"         { return TYPE_MATRIZ; }
 "Cadeia"         { return TYPE_STRING; }
 "Int"            { return TYPE_INT; }
 "Flut"           { return TYPE_FLOAT; }

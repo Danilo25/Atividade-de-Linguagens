@@ -1,0 +1,105 @@
+funcao Inteiro Main()
+    // 1. Apresentação
+    escreva("=== CLASSIFICADOR DE NÚMEROS POR INTERVALOS ===");
+    escreva("Este programa classifica números nos seguintes intervalos:");
+    escreva("[0-25], [26-50], [51-75], [76-100]");
+    escreva("");
+    escreva("Digite números positivos (ENTER após cada um)");
+    escreva("Para finalizar, digite qualquer número negativo");
+    escreva("");
+
+    // 2. Inicialização dos contadores
+    Inteiro contador_0_25   <- 0;
+    Inteiro contador_26_50  <- 0;
+    Inteiro contador_51_75  <- 0;
+    Inteiro contador_76_100 <- 0;
+    
+    // 3. Variáveis de controle
+    Real numero_atual <- 0.0;
+    Inteiro programa_ativo <- 1;
+    Inteiro numero_entrada <- 0;  
+
+    // 4. Loop principal de leitura e classificação
+    enquanto (programa_ativo == 1)
+        
+        escreva("Digite um número (negativo para sair):");
+        leia(numero_atual); // Lê o número
+
+        // Verifica condição de parada
+        se (numero_atual < 0.0)
+            programa_ativo <- 0;
+            escreva("Número negativo detectado. Encerrando programa...");
+        fimSe
+
+        // Processa apenas números válidos (não negativos)
+        se (programa_ativo == 1)
+            numero_entrada <- numero_entrada + 1;
+            
+            // === CLASSIFICAÇÃO POR INTERVALOS ===
+            
+            // Intervalo [0, 25]
+            se (numero_atual >= 0.0)
+                se (numero_atual <= 25.0)
+                    contador_0_25 <- contador_0_25 + 1;
+                    escreva("-> Classificado no intervalo [0-25]");
+                fimSe
+            fimSe
+            
+            // Intervalo [26, 50]  
+            se (numero_atual >= 26.0)
+                se (numero_atual <= 50.0)
+                    contador_26_50 <- contador_26_50 + 1;
+                    escreva("-> Classificado no intervalo [26-50]");
+                fimSe
+            fimSe
+            
+            // Intervalo [51, 75]
+            se (numero_atual >= 51.0)
+                se (numero_atual <= 75.0)
+                    contador_51_75 <- contador_51_75 + 1;
+                    escreva("-> Classificado no intervalo [51-75]");
+                fimSe
+            fimSe
+            
+            // Intervalo [76, 100]
+            se (numero_atual >= 76.0)
+                se (numero_atual <= 100.0)
+                    contador_76_100 <- contador_76_100 + 1;
+                    escreva("-> Classificado no intervalo [76-100]");
+                fimSe
+            fimSe
+            
+            // Número fora dos intervalos válidos
+            se (numero_atual > 100.0)
+                escreva("-> AVISO: Número fora dos intervalos monitorados (>100)");
+            fimSe
+            
+            escreva("");  // Linha em branco
+        fimSe
+    fimEnquanto
+
+    // 5. Apresentação dos resultados finais
+    escreva("");
+    escreva("========== RELATÓRIO FINAL ==========");
+    escreva("Total de números processados:");
+    escreva(numero_entrada);
+    escreva("");
+    escreva("Distribuição por intervalos:");
+    
+    escreva("Intervalo [0-25]:");
+    escreva(contador_0_25);
+    
+    escreva("Intervalo [26-50]:");
+    escreva(contador_26_50);
+    
+    escreva("Intervalo [51-75]:");
+    escreva(contador_51_75);
+    
+    escreva("Intervalo [76-100]:");
+    escreva(contador_76_100);
+    
+    escreva("");
+    escreva("Programa finalizado com sucesso!");
+    
+    retorne 0;
+fimFuncao

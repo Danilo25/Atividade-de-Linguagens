@@ -1,5 +1,4 @@
 %{
-#include "parser.tab.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -19,7 +18,7 @@ static int label_count = 0;
 static char* current_struct_name = NULL;
 static char* current_function_return_type = NULL;
 
-/* NOVAS STRUCTS PARA PASSAR DADOS DAS REGRAS */
+/* STRUCTS PARA PASSAR DADOS DE REGRAS COMPLEXAS */
 struct FuncHeader {
     struct record* type_rec;
     char* name;
@@ -31,7 +30,6 @@ struct ForHeader {
     struct record* cond_rec;
     struct record* incr_rec;
 };
-
 
 char *new_label() {
     char buf[32];
@@ -45,6 +43,8 @@ char* deref_if_needed(struct record* rec) {
     }
     return strdup(rec->code);
 }
+
+/* FUNÇÕES DE VERIFICAÇÃO DE TIPO */
 
 void type_error(const char* op, const char* t1, const char* t2) {
     fprintf(stderr, "ERRO SEMÂNTICO (linha %d): Operação '%s' inválida entre os tipos '%s' e '%s'\n",
@@ -75,6 +75,10 @@ void check_assignment_types(const char* var_type, const char* val_type) {
     if (strcmp(var_type, "Bool") == 0 && strcmp(val_type, "Int") == 0) return;
     if (strcmp(var_type, "Int") == 0 && strcmp(val_type, "Bool") == 0) return;
 
+    /* Permite atribuição de ponteiros (ex: Lista<Int> = ...malloc...) */
+    if (strstr(var_type, "Lista<") && strcmp(val_type, "Pointer") == 0) return;
+    if (strstr(var_type, "Matriz<") && strcmp(val_type, "Pointer") == 0) return;
+
     fprintf(stderr, "ERRO SEMÂNTICO (linha %d): Impossível atribuir tipo '%s' a uma variável do tipo '%s'\n",
             yylineno, val_type, var_type);
     exit(1);
@@ -87,6 +91,54 @@ const char* get_result_type(const char* t1, const char* t2) {
     return "Int";
 }
 
+/* === FUNÇÕES AUXILIARES PARA LISTAS/MATRIZES === */
+
+/* Descasca o tipo para permitir acesso indexado */
+char* get_inner_type(const char* complex_type) {
+    if (complex_type == NULL) return strdup("void");
+
+    /* Se for Matriz, vira Lista */
+    if (strncmp(complex_type, "Matriz<", 7) == 0) {
+        int len = strlen(complex_type);
+        char* new_type = malloc(len); 
+        sprintf(new_type, "Lista<%s", complex_type + 7); 
+        return new_type;
+    }
+
+    /* Se for Lista, vira o tipo base */
+    if (strncmp(complex_type, "Lista<", 6) == 0) {
+        const char *start = strchr(complex_type, '<');
+        const char *end = strrchr(complex_type, '>');
+        if (start && end) {
+            int len = end - (start + 1);
+            char *base_type = malloc(len + 1);
+            strncpy(base_type, start + 1, len);
+            base_type[len] = '\0';
+            return base_type;
+        }
+    }
+
+    return strdup(complex_type); 
+}
+
+/* Extrai o tipo base C puro para o malloc */
+const char* get_c_base_type(const char* complex_type) {
+    const char *start = strchr(complex_type, '<');
+    const char *end = strrchr(complex_type, '>');
+    
+    if (start && end) {
+        int len = end - (start + 1);
+        char *base_string = malloc(len + 1);
+        strncpy(base_string, start + 1, len);
+        base_string[len] = '\0';
+        
+        const char* c_type = map_type(base_string);
+        free(base_string);
+        return c_type;
+    }
+    return "void";
+}
+
 %}
 
 %union {
@@ -94,8 +146,8 @@ const char* get_result_type(const char* t1, const char* t2) {
     double float_val;
     char *str_val;
     struct record *rec;
-    struct FuncHeader* func_header; /* NOVO */
-    struct ForHeader* for_header;   /* NOVO */
+    struct FuncHeader* func_header;
+    struct ForHeader* for_header;
 }
 
 %token <str_val> ID
@@ -108,6 +160,7 @@ const char* get_result_type(const char* t1, const char* t2) {
 %token DO UNTIL FUNCTION ENDFUNCTION STRUCT ENDSTRUCT ENUM
 %token REF NEW NULO
 %token TYPE_INT TYPE_FLOAT TYPE_STRING TYPE_BOOL TYPE_LIST
+%token TYPE_MATRIZ 
 
 %token ASSIGN EQ NE LE GE LT GT
 %token AND OR NOT
@@ -115,13 +168,13 @@ const char* get_result_type(const char* t1, const char* t2) {
 %token PLUS MINUS MUL DIV PLUSPLUS MINUSMINUS
 %token SEMICOLON COLON COMMA LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET DOT
 
-%type <rec> program declaration_list function_definition
+%type <rec> program declaration_list function_definition struct_definition
 %type <rec> optional_statement_list statement_list_non_empty
 %type <rec> statement declaration_statement
 %type <rec> expression_statement if_statement while_statement for_statement return_statement
 %type <rec> print_statement scan_statement
 %type <rec> type simple_type
-%type <rec> expression list_literal
+%type <rec> expression list_literal lvalue 
 %type <rec> parameter_list param_list_non_empty parameter
 %type <rec> argument_list expression_list
 %type <rec> brace_block
@@ -129,9 +182,9 @@ const char* get_result_type(const char* t1, const char* t2) {
 %type <rec> for_init
 %type <rec> case_item case_list default_case
 
-/* MARCADORES PARA RESOLVER CONFLITOS */
 %type <func_header> func_header_push
-%type <for_header> for_header_push
+%type <for_header> for_header_part
+%type <rec> for_header_scope
 %type <rec> rparen_push
 %type <rec> do_push
 %type <rec> colon_push
@@ -153,8 +206,14 @@ program:
     declaration_list {
         fprintf(yyout,
             "#include <stdio.h>\n"
-            "#include <stdlib.h>\n"
+            "#include <stdlib.h>\n" 
             "#include <string.h>\n\n"
+            /* Função auxiliar para alocar matrizes em C */
+            "void** alloc_matrix(int r, int c, size_t size) {\n"
+            "    void** m = malloc(r * sizeof(void*));\n"
+            "    for(int i=0; i<r; i++) m[i] = malloc(c * size);\n"
+            "    return m;\n"
+            "}\n\n"
         );
         fprintf(yyout, "%s\n", $1->code);
         freeRecord($1);
@@ -176,7 +235,7 @@ declaration_list:
 struct_definition:
     STRUCT ID
         member_list
-    ENDSTRUCT
+    ENDSTRUCT { $$ = createRecord("", ""); }
     ;
 
 member_list:
@@ -187,16 +246,23 @@ member:
     type ID SEMICOLON
     ;
 
-/* MARCADORES PARA RESOLVER CONFLITO DE PUSH DE ESCOPO */
+/* === CORREÇÃO CRÍTICA 1: Escopo de Função === */
+/* Abre o escopo ANTES de processar a parameter_list */
 func_header_push:
-    FUNCTION type ID LPAREN parameter_list RPAREN { 
+    FUNCTION type ID {
+        /* 1. Insere o nome da função no escopo GLOBAL */
+        checkDuplicateVariable($3);
+        insertSymbol($3, $2->opt1);
+    } LPAREN { 
+        /* 2. Cria o NOVO escopo para os parâmetros */
         pushScope(); 
+    } parameter_list RPAREN { 
         current_function_return_type = strdup($2->opt1);
         
         $$ = malloc(sizeof(struct FuncHeader));
         $$->type_rec = $2;
         $$->name = $3;
-        $$->param_rec = $5;
+        $$->param_rec = $7; /* ATENÇÃO: type(2), ID(3), Action(4), LPAREN(5), Action(6), Params(7) */
     }
     ;
 
@@ -208,14 +274,20 @@ do_push:
     DO { pushScope(); $$ = createRecord("", ""); }
     ;
 
-for_header_push:
-    FOR LPAREN for_init SEMICOLON expression SEMICOLON expression RPAREN { 
-        pushScope(); 
+/* === CORREÇÃO CRÍTICA 2: Escopo de Loop (Para) === */
+/* Abre o escopo ANTES da inicialização */
+for_header_scope:
+    FOR LPAREN { pushScope(); $$ = createRecord("", ""); }
+    ;
+
+for_header_part:
+    for_header_scope for_init SEMICOLON expression SEMICOLON expression RPAREN { 
+        /* O escopo já foi aberto em for_header_scope */
         
         $$ = malloc(sizeof(struct ForHeader));
-        $$->init_rec = $3;
-        $$->cond_rec = $5;
-        $$->incr_rec = $7;
+        $$->init_rec = $2;
+        $$->cond_rec = $4;
+        $$->incr_rec = $6;
     }
     ;
 
@@ -280,8 +352,19 @@ parameter:
 
 type:
     simple_type { $$ = $1; }
-    | TYPE_LIST LT type GT {
-        $$ = createRecord("/*LISTA*/", "List");
+    | TYPE_LIST LT simple_type GT {
+        char* c_type = cat($3->code, "*", "", "", ""); 
+        char* internal_type = cat("Lista<", $3->opt1, ">", "", "");
+        $$ = createRecord(c_type, internal_type);
+        free(c_type); free(internal_type);
+        freeRecord($3);
+    }
+    | TYPE_MATRIZ LT simple_type GT {
+        char* c_type = cat($3->code, "**", "", "", ""); 
+        char* internal_type = cat("Matriz<", $3->opt1, ">", "", "");
+        $$ = createRecord(c_type, internal_type);
+        free(c_type); free(internal_type);
+        freeRecord($3);
     }
     | REF simple_type {
         char* s = cat($2->code, "*", "", "", "");
@@ -499,7 +582,7 @@ while_statement:
     ;
 
 for_statement:
-    for_header_push optional_statement_list { popScope(); } ENDFOR {
+    for_header_part optional_statement_list { popScope(); } ENDFOR {
         char *l_begin = new_label();
         char *l_end = new_label();
         char *label_begin = cat(l_begin, ":", "", "", "");
@@ -514,15 +597,18 @@ for_statement:
         char *s2 = cat("\n", cond, "\n", body, "\n");
         char *s3 = cat(increment, "\n", goto_begin, "\n", "    ");
         char *s4 = cat(label_end, "\n", "", "", "");
+        
+        /* --- ENVOLVER EM CHAVES {} NO C GERADO --- */
         char *code_p1 = cat(s1, s2, "", "", "");
         char *code_p2 = cat(s3, s4, "", "", "");
-        char *code = cat(code_p1, code_p2, "", "", "");
+        char *inner = cat(code_p1, code_p2, "", "", "");
+        char *code = cat("{\n", inner, "}\n", "", "");
 
 
         $$ = createRecord(code, "");
         free(l_begin); free(l_end); free(label_begin); free(c_p); free(cond);
         free(increment); free(goto_begin); free(label_end);
-        free(s1); free(s2); free(s3); free(s4); free(code_p1); free(code_p2); free(code);
+        free(s1); free(s2); free(s3); free(s4); free(code_p1); free(code_p2); free(inner);
         
         freeRecord($1->init_rec);
         freeRecord($1->cond_rec);
@@ -610,6 +696,22 @@ print_statement:
     }
 ;
 
+lvalue:
+    ID {
+        checkUndeclaredVariable($1);
+        const char *type = lookupSymbol($1);
+        $$ = createRecord($1, strdup(type ? type : ""));
+    }
+    | lvalue LBRACKET expression RBRACKET {
+        char* s = cat($1->code, "[", $3->code, "]", "");
+        char* base_type = get_inner_type($1->opt1);
+        
+        $$ = createRecord(s, base_type);
+        free(s); free(base_type);
+        freeRecord($1); freeRecord($3);
+    }
+    ;
+
 expression:
     INT_LIT {
         char b[32]; sprintf(b, "%d", $1);
@@ -623,11 +725,7 @@ expression:
         $$ = createRecord(strdup($1), "String");
         free($1);
     }
-    | ID {
-        checkUndeclaredVariable($1);
-        const char *type = lookupSymbol($1);
-        $$ = createRecord($1, strdup(type ? type : ""));
-    }
+    | lvalue { $$ = $1; }
     | expression PLUS expression {
         const char* t1 = $1->opt1;
         const char* t2 = $3->opt1;
@@ -735,8 +833,7 @@ expression:
         $$ = createRecord(s, $1->opt1); free(s);
         freeRecord($1);
     }
-    | expression ASSIGN expression {
-        checkUndeclaredVariable($1->code);
+    | lvalue ASSIGN expression {
         check_assignment_types($1->opt1, $3->opt1);
         char *s = cat($1->code, " = ", $3->code, "", "");
         $$ = createRecord(s, $1->opt1); free(s);
@@ -749,15 +846,42 @@ expression:
     | LPAREN expression RPAREN { $$ = $2; }
     | ID LPAREN argument_list RPAREN {
         checkUndeclaredVariable($1);
+        const char* func_type = lookupSymbol($1);
         char *s = cat($1, "(", $3->code, ")", "");
-        $$ = createRecord(s, "Unit");
+        $$ = createRecord(s, strdup(func_type ? func_type : "Unit"));
         free(s); free($1); freeRecord($3);
     }
     | expression DOT ID
     | expression DOT ID LPAREN argument_list RPAREN
-    | expression LBRACKET expression RBRACKET
     | list_literal
-    | NEW simple_type LPAREN argument_list RPAREN { $$ = createRecord("", ""); }
+    | NEW type LPAREN expression RPAREN {
+        /* new Lista<Int>(10) */
+        const char* c_base_type = get_c_base_type($2->opt1);
+        /* Quebrando cat em dois passos para respeitar o limite de 5 argumentos */
+        char* part1 = cat("( (", $2->code, ") malloc(sizeof(", c_base_type, "");
+        char* part2 = cat(") * (", $4->code, ")) )", "", "");
+        
+        char* s = cat(part1, part2, "", "", "");
+        
+        $$ = createRecord(s, "Pointer");
+        free(part1); free(part2); free(s);
+        freeRecord($2); freeRecord($4);
+    }
+    | NEW type LPAREN expression COMMA expression RPAREN {
+        /* new Matriz<Int>(10, 20) */
+        const char* c_base_type = get_c_base_type($2->opt1);
+        
+        /* Chama a função auxiliar alloc_matrix(rows, cols, sizeof(base_type)) */
+        char* s_alloc = cat("alloc_matrix(", $4->code, ", ", $6->code, ", sizeof(");
+        char* s_final = cat(s_alloc, c_base_type, "))", "", "");
+        
+        /* Cast para o tipo da variável (ex: int**) */
+        char* s_cast = cat("( (", $2->code, ") ", s_final, ")");
+        
+        $$ = createRecord(s_cast, "Pointer");
+        free(s_alloc); free(s_final); free(s_cast);
+        freeRecord($2); freeRecord($4); freeRecord($6);
+    }
     | NULO { $$ = createRecord("NULL", "null"); }
     ;
 

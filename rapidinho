@@ -4,9 +4,9 @@ bison -d parser.y
 
 flex -o lex.yy.c scanner.l
 
-gcc -o meu_compilador parser.tab.c lex.yy.c lib/record.c lib/symbol_table.c -lfl
+gcc -o meu_compilador -I. parser.tab.c lex.yy.c lib/record.c lib/symbol_table.c -lfl
 
-./meu_compilador ./src/problemas/nomedoarquivo.dtlang saida.c
+./meu_compilador src/problemas/problema3.dtlang saida.c
 
 gcc -o meu_programa saida.c
 

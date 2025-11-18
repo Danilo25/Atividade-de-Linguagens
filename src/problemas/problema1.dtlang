@@ -1,46 +1,33 @@
-// Programa de Avaliação de Expressão Aritmética
-// Adaptado para DataLang (sem entrada interativa)
-
 funcao Inteiro Main()
-    // === PROGRAMA DE CÁLCULO DA EXPRESSÃO x² - y + c ===
-
-    // 1. Apresentação do programa
-    escreva("=== CALCULADORA DE EXPRESSÃO ARITMÉTICA ===");
-    escreva("Este programa calcula: x² - y + c");
-    escreva("Onde x e y são números decimais (Real) e c é um inteiro (Inteiro)");
+    escreva("=== PROBLEMA 1: Avaliação de Expressão ===");
+    escreva("Calcula: x^2 - y + c");
     escreva("");
 
-    // 2. Declaração das variáveis
-    // Valores fixos, pois a função 'leia' (read) não é implementada na gramática.
-    Real x <- 10.5;
-    Real y <- 5.2;
-    Inteiro c <- 7;
-    Real resultado;
+    // Declaração das variáveis
+    Real x;
+    Real y;
+    Inteiro c;
 
-    // 3. Confirmação dos valores recebidos (fixos)
-    escreva("=== VALORES UTILIZADOS (fixos) ===");
-    escreva("x (Real) =");
-    escreva(x);
-    escreva("y (Real) =");
-    escreva(y);
-    escreva("c (Inteiro) =");
-    escreva(c);
+    // Entrada de dados pelo usuário
+    escreva("Digite o valor de x (Real):");
+    leia(x);
+
+    escreva("Digite o valor de y (Real):");
+    leia(y);
+
+    escreva("Digite o valor de c (Inteiro):");
+    leia(c);
+
+    // Cálculo: x^2 - y + c
+    Real resultado <- (x * x) - y + c;
+
+    // Exibição dos resultados
     escreva("");
+    escreva("--- Resultado ---");
+    escreva("x: " + x);
+    escreva("y: " + y);
+    escreva("c: " + c);
+    escreva("Resultado final: " + resultado);
 
-    // 4. Cálculo da expressão x² - y + c
-    escreva("=== CÁLCULO DA EXPRESSÃO ===");
-    escreva("Calculando: x² - y + c");
-    escreva("Substituindo os valores...");
-
-    resultado <- x * x - y + c;
-
-    // 5. Apresentação do resultado final
-    escreva("");
-    escreva("=== RESULTADO FINAL ===");
-    escreva("x² - y + c =");
-    escreva(resultado);
-    escreva("");
-    escreva("Cálculo realizado com sucesso!");
-    
     retorne 0;
 fimFuncao
