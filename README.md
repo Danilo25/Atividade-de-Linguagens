@@ -65,5 +65,5 @@ $ make compile file=src/demo.dtlang
 ### 3. Executar um programa
 
 ```bash
-$ make compile file=src/demo.dtlang
+$ make run file=src/demo.dtlang
 ```
