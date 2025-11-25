@@ -1,0 +1,121 @@
+estrutura No
+    Inteiro chave;
+    No esq;
+    No dir;
+fimEstrutura
+
+funcao No novoNo(Inteiro val)
+    No n <- novo No();
+    n.chave <- val;
+    n.esq <- nulo;
+    n.dir <- nulo;
+    retorne n;
+fimFuncao
+
+funcao No inserir(No raiz, Inteiro val)
+    se (raiz == nulo)
+        retorne novoNo(val);
+    fimSe
+
+    se (val < raiz.chave)
+        raiz.esq <- inserir(raiz.esq, val);
+    senao
+        raiz.dir <- inserir(raiz.dir, val);
+    fimSe
+    
+    retorne raiz;
+fimFuncao
+
+funcao Inteiro altura(No n)
+    se (n == nulo)
+        retorne 0;
+    fimSe
+    Inteiro esqH <- altura(n.esq);
+    Inteiro dirH <- altura(n.dir);
+    se (esqH > dirH)
+        retorne esqH + 1;
+    senao
+        retorne dirH + 1;
+    fimSe
+fimFuncao
+
+funcao Inteiro imprimirNivel(No n, Inteiro nivelAtual, Inteiro nivelAlvo)
+    se (n == nulo)
+        retorne 0;
+    fimSe
+
+    se (nivelAtual == nivelAlvo)
+        exibir(n.chave); 
+    senao
+        imprimirNivel(n.esq, nivelAtual + 1, nivelAlvo);
+        imprimirNivel(n.dir, nivelAtual + 1, nivelAlvo);
+    fimSe
+    retorne 0;
+fimFuncao
+
+funcao Inteiro imprimirArvorePorNiveis(No raiz)
+    Inteiro h <- altura(raiz);
+    Inteiro i;
+
+    para (i <- 0; i < h; i += 1)
+        exibir("Nivel " + i + ": ");
+        imprimirNivel(raiz, 0, i);
+        escreva(""); 
+    fimPara
+    retorne 0;
+fimFuncao
+
+funcao Inteiro encontrarMinimo(No n, Inteiro nivel)
+    se (n == nulo)
+        escreva("Arvore vazia");
+        retorne 0;
+    fimSe
+    se (n.esq == nulo)
+        escreva("Minimo: " + n.chave + " no nivel: " + nivel);
+        retorne n.chave;
+    senao
+        retorne encontrarMinimo(n.esq, nivel + 1);
+    fimSe
+fimFuncao
+
+funcao Inteiro encontrarMaximo(No n, Inteiro nivel)
+    se (n == nulo)
+        escreva("Arvore vazia");
+        retorne 0;
+    fimSe
+    se (n.dir == nulo)
+        escreva("Maximo: " + n.chave + " no nivel: " + nivel);
+        retorne n.chave;
+    senao
+        retorne encontrarMaximo(n.dir, nivel + 1);
+    fimSe
+fimFuncao
+
+funcao Inteiro Main()
+    escreva("=== PROBLEMA 6: Arvore Binaria de Busca ===");
+    
+    No raiz <- nulo;
+    Inteiro qtd;
+    Inteiro valor_temp;
+    Inteiro i;
+
+    escreva("Digite a quantidade de nos:");
+    leia(qtd);
+
+    para (i <- 0; i < qtd; i += 1)
+        escreva("Digite o valor do no " + (i + 1) + ":");
+        leia(valor_temp);
+        raiz <- inserir(raiz, valor_temp);
+    fimPara
+
+    escreva("");
+    escreva("--- Impressao da Arvore ---");
+    imprimirArvorePorNiveis(raiz);
+    
+    escreva("");
+    escreva("--- Extremos ---");
+    encontrarMinimo(raiz, 0);
+    encontrarMaximo(raiz, 0);
+
+    retorne 0;
+fimFuncao

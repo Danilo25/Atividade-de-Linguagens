@@ -150,7 +150,6 @@ int main() {
     L22:
     printf("%s\n", "Impossível somar: Dimensões diferentes.");
     L23:
-
     if (!((ca == lb))) goto L24;
     printf("%s\n", "--- Produto (A * B) ---");    double** resProd = MultiplicarMatrizes(mA, mB, la, ca, cb);
     ImprimirMatriz(resProd, la, cb);
@@ -159,7 +158,6 @@ int main() {
     L24:
     printf("%s\n", "Impossível multiplicar: Colunas de A != Linhas de B.");
     L25:
-
     return 0;
 }
 

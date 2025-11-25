@@ -2,34 +2,32 @@
 #include <stdlib.h>
 #include <string.h>
 
+void** alloc_matrix(int r, int c, size_t size) {
+    void** m = malloc(r * sizeof(void*));
+    for(int i=0; i<r; i++) m[i] = malloc(c * size);
+    return m;
+}
+
 
 int main() {
-    printf("%s\n", "=== CALCULADORA DE EXPRESSÃO ARITMÉTICA ===");
-    printf("%s\n", "Este programa calcula: x² - y + c");
-    printf("%s\n", "Onde x e y são números decimais (Real) e c é um inteiro (Inteiro)");
+    printf("%s\n", "=== PROBLEMA 1: Avaliação de Expressão ===");    printf("%s\n", "Calcula: x^2 - y + c");
     printf("%s\n", "");
-    double x = 10.500000;
-    double y = 5.200000;
-    int c = 7;
-    double resultado;
-    printf("%s\n", "=== VALORES UTILIZADOS (fixos) ===");
-    printf("%s\n", "x (Real) =");
-    printf("%lf\n", x);
-    printf("%s\n", "y (Real) =");
-    printf("%lf\n", y);
-    printf("%s\n", "c (Inteiro) =");
-    printf("%d\n", c);
+    double x;
+    double y;
+    int c;
+    printf("%s\n", "Digite o valor de x (Real):");
+    scanf("%lf", &x);
+    printf("%s\n", "Digite o valor de y (Real):");
+    scanf("%lf", &y);
+    printf("%s\n", "Digite o valor de c (Inteiro):");
+    scanf("%d", &c);
+    double resultado = (((x * x) - y) + c);
     printf("%s\n", "");
-    printf("%s\n", "=== CÁLCULO DA EXPRESSÃO ===");
-    printf("%s\n", "Calculando: x² - y + c");
-    printf("%s\n", "Substituindo os valores...");
-    resultado = (((x * x) - y) + c);
-    printf("%s\n", "");
-    printf("%s\n", "=== RESULTADO FINAL ===");
-    printf("%s\n", "x² - y + c =");
-    printf("%lf\n", resultado);
-    printf("%s\n", "");
-    printf("%s\n", "Cálculo realizado com sucesso!");
+    printf("%s\n", "--- Resultado ---");
+    printf("x: %lf" "\n", x);
+    printf("y: %lf" "\n", y);
+    printf("c: %d" "\n", c);
+    printf("Resultado final: %lf" "\n", resultado);
     return 0;
 }
 

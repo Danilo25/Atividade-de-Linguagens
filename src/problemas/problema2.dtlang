@@ -1,10 +1,10 @@
 funcao Inteiro Main()
     escreva("=== PROBLEMA 2: Classificação de Intervalos ===");
-    
-    Inteiro c1 <- 0; // [0, 25]
-    Inteiro c2 <- 0; // [26, 50]
-    Inteiro c3 <- 0; // [51, 75]
-    Inteiro c4 <- 0; // [76, 100]
+
+    Inteiro c1 <- 0;
+    Inteiro c2 <- 0;
+    Inteiro c3 <- 0;
+    Inteiro c4 <- 0;
     
     Real num <- 0.0;
     Inteiro lendo <- 1;
@@ -18,16 +18,16 @@ funcao Inteiro Main()
             lendo <- 0;
         senao
             se (num >= 0.0 && num <= 25.0)
-                c1 <- c1 + 1;
-            senao 
+                c1 += 1;
+            senao
                 se (num >= 26.0 && num <= 50.0)
-                    c2 <- c2 + 1;
+                    c2 += 1;
                 senao
                     se (num >= 51.0 && num <= 75.0)
-                        c3 <- c3 + 1;
+                        c3 += 1;
                     senao
                         se (num >= 76.0 && num <= 100.0)
-                            c4 <- c4 + 1;
+                            c4 += 1;
                         fimSe
                     fimSe
                 fimSe
@@ -35,6 +35,7 @@ funcao Inteiro Main()
         fimSe
     fimEnquanto
 
+    escreva("");
     escreva("Resultados:");
     escreva("Intervalo [0, 25]: " + c1);
     escreva("Intervalo [26, 50]: " + c2);
