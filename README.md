@@ -40,12 +40,13 @@ Certifique-se de ter os seguintes pacotes instalados em seu sistema:
 - [Flex](https://github.com/westes/flex)
 - [Bison](https://www.gnu.org/software/bison/)
 - [GCC](https://gcc.gnu.org/)
+- [Make](https://www.gnu.org/software/make/)
 
 Caso ainda não tenha os pacotes acima, você pode facilmente instalá-los:
 
 ```bash
 # Linux (Ubuntu/Debian)
-$ sudo apt install flex bison gcc
+$ sudo apt install flex bison gcc make
 ```
 
 ## Passo a Passo
