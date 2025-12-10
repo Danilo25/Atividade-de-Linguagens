@@ -1,0 +1,4 @@
+funcao Inteiro Main()
+    Inteiro x <- "string";
+    escreva(x + 5);
+fimFuncao

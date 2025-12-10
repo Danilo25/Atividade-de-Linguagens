@@ -1,0 +1,5 @@
+funcao Inteiro Main()
+    Lista<Texto> nomes <- ["Alice", "Bob"];
+    Inteiro numero <- nomes[0];
+    escreva(numero);
+fimFuncao

@@ -1,0 +1,6 @@
+funcao Inteiro Main()
+    Lista<Inteiro> lista <- [1, 2, 3];
+    Inteiro primeiro <- lista[0];
+    Inteiro invalido <- lista[10];
+    escreva(invalido);
+fimFuncao

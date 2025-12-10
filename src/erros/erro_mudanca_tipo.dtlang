@@ -1,0 +1,5 @@
+funcao Inteiro Main()
+    Inteiro x <- 5;
+    x <- "agora é texto";
+    escreva(x);
+fimFuncao

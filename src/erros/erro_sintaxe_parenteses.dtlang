@@ -1,0 +1,8 @@
+funcao Inteiro Main()
+    Inteiro x <- 10;
+    Inteiro y <- 20;
+    
+    se (x > y
+        escreva("x é maior");
+    fimSe
+fimFuncao

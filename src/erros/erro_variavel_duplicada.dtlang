@@ -1,0 +1,5 @@
+funcao Inteiro Main()
+    Inteiro x <- 10;
+    Inteiro x <- 20;
+    escreva(x);
+fimFuncao

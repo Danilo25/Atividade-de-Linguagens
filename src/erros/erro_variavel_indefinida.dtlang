@@ -1,0 +1,4 @@
+funcao Inteiro Main()
+    indefinido_var <- 10;
+    escreva(indefinido_var);
+fimFuncao

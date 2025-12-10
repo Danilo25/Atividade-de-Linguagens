@@ -1,0 +1,8 @@
+funcao Inteiro soma(Inteiro a, Inteiro b)
+    retorne a + b
+fimFuncao
+
+funcao Inteiro Main()
+    Inteiro resultado <- soma(5, 3)
+    escreva(resultado)
+fimFuncao

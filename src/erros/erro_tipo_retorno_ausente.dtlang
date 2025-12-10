@@ -1,0 +1,3 @@
+funcao Main()
+    escreva("Falta tipo de retorno");
+fimFuncao

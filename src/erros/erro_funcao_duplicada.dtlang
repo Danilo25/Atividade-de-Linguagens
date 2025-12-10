@@ -1,0 +1,12 @@
+funcao Inteiro duplicado()
+    retorne 1;
+fimFuncao
+
+funcao Inteiro duplicado()
+    retorne 2;
+fimFuncao
+
+funcao Inteiro Main()
+    Inteiro x <- duplicado();
+    escreva(x);
+fimFuncao
